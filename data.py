@@ -142,7 +142,6 @@ AVAILABLE_TRANSFORMS = {
         transforms.ToTensor(),
     ],
     'cifar': [
-        transforms.Pad(2),
         transforms.ToTensor(),
     ]
 }
@@ -169,18 +168,18 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
     if name == 'splitCIFAR100':
         config = DATASET_CONFIGS['cifar']
         classes_per_task = 10
-        train_datasets = ClassIncremental(
+        train_datasets = list(ClassIncremental(
         CIFAR100(data_dir, download=True),
         increment=10,
         initial_increment=10,
         train=True  # a different loader for test
-        )
-        test_datasets = ClassIncremental(
+        ))
+        test_datasets = list(ClassIncremental(
         CIFAR100(data_dir, download=True),
         increment=10,
         initial_increment=10,
         train=False  # a different loader for test
-        )
+        ))
 
 
     elif name == 'permMNIST':
