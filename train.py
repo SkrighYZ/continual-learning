@@ -46,7 +46,7 @@ def train_cl(model, train_datasets, test_datasets, replay_mode="none", scenario=
                 model.register_buffer('{}_SI_prev_task'.format(n), p.data.clone())
 
     # Loop over all tasks.
-    Rmatrix = np.zeros(len(train_datasets), len(train_datasets))
+    Rmatrix = np.zeros(10, 10)
     for task, train_dataset in enumerate(train_datasets, 1):
         model.train()
 
