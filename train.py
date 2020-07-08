@@ -355,7 +355,7 @@ def train_cl(model, train_datasets, test_datasets, replay_mode="none", experimen
         print('Eval...')
         for task_t, test_dataset in enumerate(test_datasets, 1):
             Rmatrix[task, task_t] = evaluate.validate(
-            model, test_dataset, verbose=False, test_size=None, task=tast_t+1, with_exemplars=False,
-            allowed_classes=list(range(classes_per_task*task_t, classes_per_task*(tast_t+1))) if scenario=="task" else None)
+            model, test_dataset, verbose=False, test_size=None, task=task_t+1, with_exemplars=False,
+            allowed_classes=list(range(classes_per_task*task_t, classes_per_task*(task_t+1))) if scenario=="task" else None)
         np.save(open('Rmatrix.npy', 'wb'), Rmatrix)
             
