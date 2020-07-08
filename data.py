@@ -240,7 +240,7 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
             raise ValueError("Experiment 'splitCIFAR100' cannot have more than 100 tasks!")
         # configurations
         config = DATASET_CONFIGS['cifar100']
-        classes_per_task = int(np.floor(10 / tasks))
+        classes_per_task = int(np.floor(100 / tasks))
         if not only_config:
             # prepare permutation to shuffle label-ids (to create different class batches for each random seed)
             permutation = np.array(list(range(10))) if exception else np.random.permutation(list(range(10)))
