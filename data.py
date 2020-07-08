@@ -4,8 +4,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import ConcatDataset, Dataset, DataLoader
 import torch
 
-from continuum import ClassIncremental, split_train_val
-from continuum.datasets import CIFAR100
+#from continuum import ClassIncremental, split_train_val
+#from continuum.datasets import CIFAR100
 
 
 def _permutate_image_pixels(image, permutation):
