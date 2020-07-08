@@ -1,8 +1,11 @@
 import copy
 import numpy as np
 from torchvision import datasets, transforms
-from torch.utils.data import ConcatDataset, Dataset
+from torch.utils.data import ConcatDataset, Dataset, DataLoader
 import torch
+
+from continuum import ClassIncremental, split_train_val
+from continuum.datasets import CIFAR100
 
 
 def _permutate_image_pixels(image, permutation):
@@ -126,6 +129,7 @@ class ExemplarDataset(Dataset):
 # specify available data-sets.
 AVAILABLE_DATASETS = {
     'mnist': datasets.MNIST,
+    'cifar': datasets.CIFAR100
 }
 
 # specify available transforms.
@@ -137,12 +141,17 @@ AVAILABLE_TRANSFORMS = {
     'mnist28': [
         transforms.ToTensor(),
     ],
+    'cifar': [
+        transforms.Pad(2),
+        transforms.ToTensor(),
+    ]
 }
 
 # specify configurations of available data-sets.
 DATASET_CONFIGS = {
     'mnist': {'size': 32, 'channels': 1, 'classes': 10},
     'mnist28': {'size': 28, 'channels': 1, 'classes': 10},
+    'cifar': {'size': 32, 'channels': 3, 'classes': 100}
 }
 
 
@@ -157,7 +166,24 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
                             are not shuffled before being distributed over the tasks (splitMNIST)'''
 
     # depending on experiment, get and organize the datasets
-    if name == 'permMNIST':
+    if name == 'splitCIFAR100':
+        config = DATASET_CONFIGS['cifar']
+        classes_per_task = 10
+        train_datasets = ClassIncremental(
+        CIFAR100(data_dir, download=True),
+        increment=10,
+        initial_increment=10,
+        train=True  # a different loader for test
+        )
+        test_datasets = ClassIncremental(
+        CIFAR100(data_dir, download=True),
+        increment=10,
+        initial_increment=10,
+        train=False  # a different loader for test
+        )
+
+
+    elif name == 'permMNIST':
         # configurations
         config = DATASET_CONFIGS['mnist']
         classes_per_task = 10

@@ -30,7 +30,7 @@ parser.add_argument('--results-dir', type=str, default='./results', dest='r_dir'
 
 # expirimental task parameters
 task_params = parser.add_argument_group('Task Parameters')
-task_params.add_argument('--experiment', type=str, default='splitMNIST', choices=['permMNIST', 'splitMNIST'])
+task_params.add_argument('--experiment', type=str, default='splitMNIST', choices=['permMNIST', 'splitMNIST', 'splitCIFAR100'])
 task_params.add_argument('--scenario', type=str, default='class', choices=['task', 'domain', 'class'])
 task_params.add_argument('--tasks', type=int, help='number of tasks')
 
@@ -402,7 +402,7 @@ def run(args):
     start = time.time()
     # Train model
     train_cl(
-        model, train_datasets, replay_mode=args.replay, scenario=scenario, classes_per_task=classes_per_task,
+        model, train_datasets, test_datasets, replay_mode=args.replay, scenario=scenario, classes_per_task=classes_per_task,
         iters=args.iters, batch_size=args.batch,
         generator=generator, gen_iters=args.g_iters, gen_loss_cbs=generator_loss_cbs,
         sample_cbs=sample_cbs, eval_cbs=eval_cbs, loss_cbs=generator_loss_cbs if args.feedback else solver_loss_cbs,
@@ -421,6 +421,7 @@ def run(args):
     #----- EVALUATION -----#
     #----------------------#
 
+    '''
     print("\n\n--> Evaluation ({}-incremental learning scenario):".format(args.scenario))
 
     # Evaluate precision of final model on full test-set
@@ -515,6 +516,7 @@ def run(args):
 
         # -close pdf
         pp.close()
+    '''
 
 
 

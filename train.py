@@ -6,12 +6,13 @@ import tqdm
 import copy
 import utils
 import time
+import evaluate
 from data import SubDataset, ExemplarDataset
 from continual_learner import ContinualLearner
 
 
 
-def train_cl(model, train_datasets, replay_mode="none", scenario="class",classes_per_task=None,iters=2000,batch_size=32,
+def train_cl(model, train_datasets, test_datasets, replay_mode="none", scenario="class",classes_per_task=None,iters=2000,batch_size=32,
              generator=None, gen_iters=0, gen_loss_cbs=list(), loss_cbs=list(), eval_cbs=list(), sample_cbs=list(),
              use_exemplars=True, add_exemplars=False, eval_cbs_exemplars=list()):
     '''Train a model (with a "train_a_batch" method) on multiple tasks, with replay-strategy specified by [replay_mode].
@@ -45,7 +46,9 @@ def train_cl(model, train_datasets, replay_mode="none", scenario="class",classes
                 model.register_buffer('{}_SI_prev_task'.format(n), p.data.clone())
 
     # Loop over all tasks.
+    Rmatrix = np.zeros(len(train_datasets), len(train_datasets))
     for task, train_dataset in enumerate(train_datasets, 1):
+        model.train()
 
         # If offline replay-setting, create large database of all tasks so far
         if replay_mode=="offline" and (not scenario=="task"):
@@ -347,3 +350,12 @@ def train_cl(model, train_datasets, replay_mode="none", scenario="class",classes
                     target_transform = (lambda y, x=classes_per_task: y % x) if scenario == "domain" else None
                     previous_datasets = [
                         ExemplarDataset(model.exemplar_sets, target_transform=target_transform)]
+
+        ##----------> Eval...
+        print('Eval...')
+        for task_t, test_dataset in enumerate(test_datasets, 1):
+            Rmatrix[task, task_t] = evaluate.validate(
+            model, test_dataset, verbose=False, test_size=None, task=tast_t+1, with_exemplars=False,
+            allowed_classes=list(range(classes_per_task*task_t, classes_per_task*(tast_t+1))) if scenario=="task" else None)
+        np.save(open('Rmatrix.npy', 'wb'), Rmatrix)
+            
