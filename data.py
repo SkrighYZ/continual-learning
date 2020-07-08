@@ -129,7 +129,7 @@ class ExemplarDataset(Dataset):
 # specify available data-sets.
 AVAILABLE_DATASETS = {
     'mnist': datasets.MNIST,
-    'cifar': datasets.CIFAR100
+    'cifar100': datasets.CIFAR100
 }
 
 # specify available transforms.
@@ -141,7 +141,7 @@ AVAILABLE_TRANSFORMS = {
     'mnist28': [
         transforms.ToTensor(),
     ],
-    'cifar': [
+    'cifar100': [
         transforms.ToTensor(),
     ]
 }
@@ -150,7 +150,7 @@ AVAILABLE_TRANSFORMS = {
 DATASET_CONFIGS = {
     'mnist': {'size': 32, 'channels': 1, 'classes': 10},
     'mnist28': {'size': 28, 'channels': 1, 'classes': 10},
-    'cifar': {'size': 32, 'channels': 3, 'classes': 100}
+    'cifar100': {'size': 32, 'channels': 3, 'classes': 100}
 }
 
 
@@ -167,7 +167,7 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
     # depending on experiment, get and organize the datasets
     '''
     if name == 'splitCIFAR100':
-        config = DATASET_CONFIGS['cifar']
+        config = DATASET_CONFIGS['cifar100']
         classes_per_task = 10
         train_datasets = list(ClassIncremental(
             CIFAR100(data_dir, download=True),
@@ -237,9 +237,9 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
     elif name == 'splitCIFAR100':
         # check for number of tasks
         if tasks>100:
-            raise ValueError("Experiment 'splitCIFAR100' cannot have more than 10 tasks!")
+            raise ValueError("Experiment 'splitCIFAR100' cannot have more than 100 tasks!")
         # configurations
-        config = DATASET_CONFIGS['cifar']
+        config = DATASET_CONFIGS['cifar100']
         classes_per_task = int(np.floor(10 / tasks))
         if not only_config:
             # prepare permutation to shuffle label-ids (to create different class batches for each random seed)
