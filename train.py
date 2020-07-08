@@ -1,6 +1,6 @@
 import torch
 from torch import optim
-from torch.utils.data import ConcatDataset
+from torch.utils.data import ConcatDataset, DataLoader
 import numpy as np
 import tqdm
 import copy
@@ -12,7 +12,7 @@ from continual_learner import ContinualLearner
 
 
 
-def train_cl(model, train_datasets, test_datasets, replay_mode="none", scenario="class",classes_per_task=None,iters=2000,batch_size=32,
+def train_cl(model, train_datasets, test_datasets, replay_mode="none", experiment='splitCIFAR100', scenario="class",classes_per_task=None,iters=2000,batch_size=32,
              generator=None, gen_iters=0, gen_loss_cbs=list(), loss_cbs=list(), eval_cbs=list(), sample_cbs=list(),
              use_exemplars=True, add_exemplars=False, eval_cbs_exemplars=list()):
     '''Train a model (with a "train_a_batch" method) on multiple tasks, with replay-strategy specified by [replay_mode].

@@ -165,24 +165,26 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
                             are not shuffled before being distributed over the tasks (splitMNIST)'''
 
     # depending on experiment, get and organize the datasets
+    '''
     if name == 'splitCIFAR100':
         config = DATASET_CONFIGS['cifar']
         classes_per_task = 10
         train_datasets = list(ClassIncremental(
-        CIFAR100(data_dir, download=True),
-        increment=10,
-        initial_increment=10,
-        train=True  # a different loader for test
+            CIFAR100(data_dir, download=True),
+            increment=10,
+            initial_increment=10,
+            train=True  # a different loader for test
         ))
         test_datasets = list(ClassIncremental(
-        CIFAR100(data_dir, download=True),
-        increment=10,
-        initial_increment=10,
-        train=False  # a different loader for test
+            CIFAR100(data_dir, download=True),
+            increment=10,
+            initial_increment=10,
+            train=False  # a different loader for test
         ))
+    '''
 
 
-    elif name == 'permMNIST':
+    if name == 'permMNIST':
         # configurations
         config = DATASET_CONFIGS['mnist']
         classes_per_task = 10
@@ -218,6 +220,35 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
             mnist_train = get_dataset('mnist28', type="train", dir=data_dir, target_transform=target_transform,
                                       verbose=verbose)
             mnist_test = get_dataset('mnist28', type="test", dir=data_dir, target_transform=target_transform,
+                                     verbose=verbose)
+            # generate labels-per-task
+            labels_per_task = [
+                list(np.array(range(classes_per_task)) + classes_per_task * task_id) for task_id in range(tasks)
+            ]
+            # split them up into sub-tasks
+            train_datasets = []
+            test_datasets = []
+            for labels in labels_per_task:
+                target_transform = transforms.Lambda(
+                    lambda y, x=labels[0]: y - x
+                ) if scenario=='domain' else None
+                train_datasets.append(SubDataset(mnist_train, labels, target_transform=target_transform))
+                test_datasets.append(SubDataset(mnist_test, labels, target_transform=target_transform))
+    elif name == 'splitCIFAR100':
+        # check for number of tasks
+        if tasks>100:
+            raise ValueError("Experiment 'splitCIFAR100' cannot have more than 10 tasks!")
+        # configurations
+        config = DATASET_CONFIGS['cifar']
+        classes_per_task = int(np.floor(10 / tasks))
+        if not only_config:
+            # prepare permutation to shuffle label-ids (to create different class batches for each random seed)
+            permutation = np.array(list(range(10))) if exception else np.random.permutation(list(range(10)))
+            target_transform = transforms.Lambda(lambda y, x=permutation: int(permutation[y]))
+            # prepare train and test datasets with all classes
+            mnist_train = get_dataset('cifar100', type="train", dir=data_dir, target_transform=target_transform,
+                                      verbose=verbose)
+            mnist_test = get_dataset('cifar100', type="test", dir=data_dir, target_transform=target_transform,
                                      verbose=verbose)
             # generate labels-per-task
             labels_per_task = [
