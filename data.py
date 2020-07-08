@@ -243,12 +243,12 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
         classes_per_task = int(np.floor(100 / tasks))
         if not only_config:
             # prepare permutation to shuffle label-ids (to create different class batches for each random seed)
-            permutation = np.array(list(range(10))) if exception else np.random.permutation(list(range(10)))
+            permutation = np.array(list(range(100))) if exception else np.random.permutation(list(range(100)))
             target_transform = transforms.Lambda(lambda y, x=permutation: int(permutation[y]))
             # prepare train and test datasets with all classes
-            mnist_train = get_dataset('cifar100', type="train", dir=data_dir, target_transform=target_transform,
+            cifar100_train = get_dataset('cifar100', type="train", dir=data_dir, target_transform=target_transform,
                                       verbose=verbose)
-            mnist_test = get_dataset('cifar100', type="test", dir=data_dir, target_transform=target_transform,
+            cifar100_test = get_dataset('cifar100', type="test", dir=data_dir, target_transform=target_transform,
                                      verbose=verbose)
             # generate labels-per-task
             labels_per_task = [
@@ -261,8 +261,8 @@ def get_multitask_experiment(name, scenario, tasks, data_dir="./datasets", only_
                 target_transform = transforms.Lambda(
                     lambda y, x=labels[0]: y - x
                 ) if scenario=='domain' else None
-                train_datasets.append(SubDataset(mnist_train, labels, target_transform=target_transform))
-                test_datasets.append(SubDataset(mnist_test, labels, target_transform=target_transform))
+                train_datasets.append(SubDataset(cifar100_train, labels, target_transform=target_transform))
+                test_datasets.append(SubDataset(cifar100_test, labels, target_transform=target_transform))
     else:
         raise RuntimeError('Given undefined experiment: {}'.format(name))
 
