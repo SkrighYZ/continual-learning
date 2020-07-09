@@ -3,7 +3,7 @@ import sys
 
 def fwt_gem(Rmatrix):
 	T = Rmatrix.shape[0]
-	fwt = sum([Rmatrix[i, i+1] for i in range(T-1)]) / (T-1)
+	fwt = sum([Rmatrix[i, i+1]-0.01 for i in range(T-1)]) / (T-1)
 	return fwt
 
 def intransigence_rwalk(Rmatrix):
